@@ -1,11 +1,11 @@
 <template>
     <header class="header">
-        <nav class="navbar">
+        <nav class="navbar" v-bind:class="$route.path === '/' ? '' : 'with-background'">
             <div class="container">
                 <div class="navbar-brand">
-                    <a class="navbar-item has-text-white is-size-2 has-text-weight-bold" href="#">
+                    <router-link class="navbar-item has-text-white is-size-2 has-text-weight-bold" v-bind:to="'/'">
                         {{title}}
-                    </a>
+                    </router-link>
                     <span role="button" tabindex="0" class="navbar-burger burger has-text-white"
                         data-target="navbar-menu">
                         <span></span>
@@ -17,15 +17,15 @@
                     <div class="navbar-end">
                         <!-- Loop through the navigation items -->
             
-                        <a
+                        <router-link
                             v-for = "item in items"
                             :key="item.text"
-                            :href="item.link"
+                            :to="item.link"
                             
                             class="navbar-item nav-web">
 
                             {{item.text}}
-                        </a>
+                        </router-link>
                     </div>
                 </div>
             </div>
