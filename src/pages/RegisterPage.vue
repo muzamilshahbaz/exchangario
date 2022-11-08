@@ -52,6 +52,7 @@
             </div>
             <button
               @click="register"
+              :disabled="isProcessing"
               type="button"
               class="button is-block is-info is-large is-fullwidth"
             >
@@ -69,6 +70,11 @@
 </template>
 
 <script>
+
+// import { mapState } from 'vuex';
+// import useRegister from '../composition/useRegister';
+import useAuth from '../composition/useAuth';
+
 export default {
   data() {
     return {
@@ -81,6 +87,46 @@ export default {
     };
   },
 
+  setup(){
+    return useAuth();
+    // return {
+    //     ...useRegister(),
+    //     ...useAuth(),
+    // };
+  },
+
+//   computed: mapState("user",{
+//     error: ({register}) => register.error,
+//     isProcessing: ({register}) => register.isProcessing,
+//   }),
+//   {
+//     password(){
+//         return this.form.password;
+//     },
+//     error() {
+//         return this.$store.state.user.register.error;
+//     },
+//     isProcessing() {
+//         return this.$store.state.user.register.isProcessing;
+//     },
+//   },
+
+  watch: {
+    // error(message){
+    //     if (message) {
+    //         alert(message);
+    //     }
+    // },
+
+    // isProcessing = false
+    // prevProcessing = true
+    // we shold not have any errors
+    isProcessing(processing, prevProcessing) {
+        if (!processing && prevProcessing && !this.error) {
+            this.$router.push("/");
+        }
+    }
+  },
   methods: {
     register() {
       this.$store.dispatch("user/register", this.form);
