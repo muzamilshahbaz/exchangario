@@ -17,10 +17,14 @@ import { faStar } from '@fortawesome/free-solid-svg-icons'
 
 library.add(faStar)
 
-const app = createApp(App);
+let app;
 
-store.dispatch('user/onAuthChange');
+store.dispatch('user/onAuthChange', () => {
+    if (!app) {
+        app = createApp(App);
 
-app.use(store).use(router).use(Toast);
-app.component('font-awesome-icon', FontAwesomeIcon)
-app.mount('#app')
+        app.use(store).use(router).use(Toast);
+        app.component('font-awesome-icon', FontAwesomeIcon)
+        app.mount('#app')
+    }
+});

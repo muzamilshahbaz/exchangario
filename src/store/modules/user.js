@@ -1,40 +1,62 @@
-import { async } from "@firebase/util";
-import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { getAuth, createUserWithEmailAndPassword, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../db";
 
 export default {
     namespaced: true,
     state() {
         return {
-            register: {
+            data: null,
+            auth: {
                 isProcessing: false,
                 error: "",
             }
         }
     },
+
+    getters: {
+        isAuthenticated(state) {
+            return !!state.data;
+        }
+    },
     actions: {
-        onAuthChange({ dispatch }) {
+        onAuthChange({ dispatch, commit }, callback) {
+            commit("setAuthIsProcessing", true);
             onAuthStateChanged(getAuth(), async(user) => {
                 if (user) {
-                    const userProfile = await dispatch('getUserProfile', user.uid);
-                    console.log(userProfile);
-
+                    await dispatch('getUserProfile', user);
+                    commit("setAuthIsProcessing", false);
+                    callback(user);
                 } else {
                     console.log('Logged out');
+                    commit("setAuthIsProcessing", false);
+                    callback(null);
                 }
             })
         },
-
-        async getUserProfile(_, id) {
-            const docRef = doc(db, "users", id);
+        async updateProfile({ commit, dispatch }, { data, onSuccess }) {
+            const userRef = doc(db, "users", data.id);
+            await updateDoc(userRef, data);
+            commit("updateProfile", data);
+            dispatch("toast/success", "Profile has been updated!", { root: true });
+            onSuccess();
+        },
+        async getUserProfile({ commit }, user) {
+            const docRef = doc(db, "users", user.uid);
             const docSnap = await getDoc(docRef);
-            return docSnap.data();
+            const userProfile = docSnap.data();
+            const userWithProfile = {
+                id: user.uid,
+                email: user.email,
+                ...userProfile
+            }
+
+            commit("setUser", userWithProfile);
         },
 
         async register({ commit, dispatch }, { email, password, username }) {
-            commit("setRegisterIsProcessing", true);
-            commit("setRegisterError", "");
+            commit("setAuthIsProcessing", true);
+            commit("setAuthError", "");
 
             // Firebase functionality to register user
 
@@ -48,10 +70,34 @@ export default {
                     exchanges: [],
                 });
             } catch (e) {
-                commit("setRegisterError", e.message);
+                commit("setAuthError", e.message);
                 dispatch("toast/error", e.message, { root: true });
             } finally {
-                commit("setRegisterIsProcessing", false);
+                commit("setAuthIsProcessing", false);
+            }
+        },
+
+        async login({ commit, dispatch }, { email, password }) {
+            commit("setAuthIsProcessing", true);
+            commit("setAuthError", "");
+
+            try {
+                await signInWithEmailAndPassword(getAuth(), email, password)
+            } catch (e) {
+                commit("setAuthError", e.message);
+                dispatch("toast/error", e.message, { root: true });
+            } finally {
+                commit("setAuthIsProcessing", false);
+            }
+
+        },
+
+        async logout({ commit }) {
+            try {
+                await signOut(getAuth());
+                commit("setUser", null);
+            } catch (e) {
+                console.error("Cannot Logout!!");
             }
         },
 
@@ -60,11 +106,17 @@ export default {
         },
     },
     mutations: {
-        setRegisterIsProcessing(state, isProcessing) {
-            state.register.isProcessing = isProcessing;
+        setAuthIsProcessing(state, isProcessing) {
+            state.auth.isProcessing = isProcessing;
         },
-        setRegisterError(state, error) {
-            state.register.error = error;
+        setAuthError(state, error) {
+            state.auth.error = error;
+        },
+        setUser(state, user) {
+            state.data = user;
+        },
+        updateProfile(state, profile) {
+            state.data = {...state.data, profile };
         },
     },
 }

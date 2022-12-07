@@ -53,7 +53,7 @@
             <button
               @click="register"
               :disabled="isProcessing"
-              type="button"
+              type="submit"
               class="button is-block is-info is-large is-fullwidth"
             >
               Sign Up
@@ -95,6 +95,12 @@ export default {
     // };
   },
 
+  // computed: {
+  //   isAuthenticated(){
+  //     return this.$store.getters["user/isAuthenticated"];
+  //   }
+  // },
+
 //   computed: mapState("user",{
 //     error: ({register}) => register.error,
 //     isProcessing: ({register}) => register.isProcessing,
@@ -112,17 +118,8 @@ export default {
 //   },
 
   watch: {
-    // error(message){
-    //     if (message) {
-    //         alert(message);
-    //     }
-    // },
-
-    // isProcessing = false
-    // prevProcessing = true
-    // we shold not have any errors
-    isProcessing(processing, prevProcessing) {
-        if (!processing && prevProcessing && !this.error) {
+    isAuthenticated(isAuth) {
+        if (isAuth) {
             this.$router.push("/");
         }
     }
