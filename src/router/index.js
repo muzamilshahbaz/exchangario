@@ -5,6 +5,8 @@ import RegisterPage from "../pages/RegisterPage.vue";
 import LoginPage from "../pages/LoginPage.vue";
 import AboutPage from "../pages/AboutPage.vue";
 import ProfilePage from "../pages/ProfilePage.vue";
+import ExchangeCreatePage from "../pages/ExchangeCreatePage.vue";
+
 import { getAuth } from "firebase/auth";
 
 const routes = [{
@@ -21,6 +23,12 @@ const routes = [{
         path: "/faq",
         name: "Faq",
         component: FaqPage,
+    },
+    {
+        path: "/exchanges/new",
+        name: "ExchangeCreate",
+        component: ExchangeCreatePage,
+        meta: { onlyAuthUser: true }
     },
     {
         path: "/profile",
