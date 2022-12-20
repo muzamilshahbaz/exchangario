@@ -92,14 +92,22 @@
           <div class="field">
             <label class="label">Tags</label>
             <div class="control">
-              <input class="input" type="text" placeholder="programming" />
-              <FormErrors :errors="v$.form.tags.$errors"/>
+              <input 
+              @input="handleTags"
+              class="input" type="text" placeholder="programming" />
+              <div 
+                v-for="tag in form.tags"
+                :key="tag"
+                class="tag is-primary is-medium"
+              >
+                {{ tag }}
+              </div>
             </div>
           </div>
           <div class="field is-grouped">
             <div class="control">
               <button
-                @click.prevent="createExchange"
+                @click.prevent ="createExchange"
                 class="button is-link"
               >
                 Submit
@@ -119,7 +127,7 @@
 import FormErrors from "@/components/FormErrors.vue";
 import { useVuelidate } from "@vuelidate/core";
 import { required, minLength, url, minValue, helpers } from "@vuelidate/validators";
-import { supportedFileType } from "@/helpers/validators";
+// import { supportedFileType } from "@/helpers/validators";
 
 export default {
     components: {
@@ -152,17 +160,17 @@ export default {
           description: { required },
           type: { required },
           image: { 
-            required,
-            url,
-            supportedFileType: helpers.withMessage("Invalid file format", supportedFileType) ,
+            required: helpers.withMessage("Image is required", required),
+            url: helpers.withMessage("Invalid url format", url),
+            // supportedFileType: helpers.withMessage("Invalid file format", supportedFileType) ,
         },
           price: { 
-            required,
+            required: helpers.withMessage("Price is required", required),
             minValue: minValue(1),
          },
-          country: { required },
-          city: { required },
-          tags: { required },
+          country: { required: helpers.withMessage("Country is required", required) },
+          city: { required: helpers.withMessage("City is required", required) },
+          tags: { required: helpers.withMessage("Tags are required", required) },
         },
       };
   },
@@ -171,8 +179,19 @@ export default {
 
         const isValid = await this.v$.$validate();
         if (isValid) {
-            
             alert(JSON.stringify(this.form));
+        }
+    },
+    handleTags(event){
+        const { value } = event.target;
+
+        if (value && value.trim().length > 1 && (value.substr(-1) === "," || value.substr(-1) === " ")) {
+            const _value = value.split(",")[0].trim();
+
+            if (this.form.tags.includes(_value) === false) {
+              this.form.tags.push(_value);
+            }
+            event.target.value = "";
         }
     },
   },
