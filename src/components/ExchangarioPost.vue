@@ -8,7 +8,7 @@
           v-bind:key="exchange.id" 
           class="column is-12-mobile is-6-tablet is-4-widescreen is-6-desktop">
             <div class="item post-card bottom-border">
-              <a class="item-link" href="#">
+              <router-link class="item-link" :to="{name: 'ExchangeDetail', params: {slug: exchange.slug}}">
                 <figure class="image is-2by1 item-figure background-img" :style="{ 'background-image': `url(${exchange.image})` }" alt="">
                 </figure>
                 <div class="item-featured">
@@ -16,7 +16,7 @@
                     <font-awesome-icon icon="star" />
                   </div>
                 </div>
-              </a>
+              </router-link>
               <div class="item-tags">
                 <a 
                 v-for="tag in exchange.tags"
@@ -28,7 +28,7 @@
               <h2 class="title item-title is-size-4 has-text-weight-extra-bold"><a class="item-link" href="#">{{ exchange.title }}</a></h2>
               <div class="level">
                 <div class="level-left">
-                  <div class="item-author">{{ exchange.user }}</div>
+                  <div class="item-author">{{ exchange.user?.username }}</div>
                 </div>
                 <div class="level-right">
                   27th December 2019

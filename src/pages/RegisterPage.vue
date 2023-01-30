@@ -14,10 +14,9 @@
                   placeholder="Email"
                   autocomplete="email"
                 />
-                <div class="form-error">
-                  <div class="help is-danger">Invalid Value</div>
-                </div>
-              </div>
+                <FormErrors :errors="v$.form.email.$errors" />
+
+            </div>
             </div>
             <div class="field">
               <div class="control">
@@ -27,6 +26,7 @@
                   type="text"
                   placeholder="Username"
                 />
+                <FormErrors :errors="v$.form.username.$errors" />
               </div>
             </div>
             <div class="field">
@@ -38,6 +38,7 @@
                   placeholder="Password"
                   autocomplete="current-password"
                 />
+                <FormErrors :errors="v$.form.password.$errors" />
               </div>
             </div>
             <div class="field">
@@ -48,12 +49,13 @@
                   type="password"
                   placeholder="Repeat the password"
                 />
+                <FormErrors :errors="v$.form.passwordConfirmation.$errors" />
               </div>
             </div>
             <button
               @click="register"
               :disabled="isProcessing"
-              type="submit"
+              type="button"
               class="button is-block is-info is-large is-fullwidth"
             >
               Sign Up
@@ -74,8 +76,14 @@
 // import { mapState } from 'vuex';
 // import useRegister from '../composition/useRegister';
 import useAuth from '../composition/useAuth';
+import FormErrors from "@/components/FormErrors.vue";
+import { useVuelidate } from "@vuelidate/core";
+import { required, sameAs, helpers, email } from "@vuelidate/validators";
 
 export default {
+  components: {
+    FormErrors
+  },
   data() {
     return {
       form: {
@@ -86,9 +94,24 @@ export default {
       },
     };
   },
-
+  validations() {
+    return {
+      form: {
+        email: {required, email},
+        username: {required},
+        password: {required},
+        passwordConfirmation: {
+          required,
+          sameAs: helpers.withMessage("Must be same as the password", sameAs(this.form.password)),
+        }
+      },
+    };
+  },
   setup(){
-    return useAuth();
+    return {
+      ...useAuth(), 
+      v$: useVuelidate()
+    };
     // return {
     //     ...useRegister(),
     //     ...useAuth(),
@@ -125,8 +148,11 @@ export default {
     }
   },
   methods: {
-    register() {
-      this.$store.dispatch("user/register", this.form);
+    async register() {
+      const isValid = await this.v$.$validate();
+      if (isValid) {
+        this.$store.dispatch("user/register", this.form);
+      }
     },
   },
 };
