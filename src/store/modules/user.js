@@ -38,6 +38,7 @@ export default {
             const userRef = doc(db, "users", data.id);
             await updateDoc(userRef, data);
             commit("updateProfile", data);
+            // commit("setUser", data);
             dispatch("toast/success", "Profile has been updated!", { root: true });
             onSuccess();
         },
@@ -116,7 +117,8 @@ export default {
             state.data = user;
         },
         updateProfile(state, profile) {
-            state.data = {...state.data, profile };
+            // state.data = {...state.data, profile };
+            state.data = profile;
         },
     },
 }
