@@ -55,9 +55,11 @@
         },
         open() {
           this.isOpen = true;
+          document.getElementById('header').style.position = 'fixed';
         },
         close(){
           this.isOpen = false;
+          document.getElementById('header').style.position = 'absolute';
         },
       }
   }

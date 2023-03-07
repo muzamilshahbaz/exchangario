@@ -28,7 +28,7 @@
               <h2 class="title item-title is-size-4 has-text-weight-extra-bold"><a class="item-link" href="#">{{ exchange.title }}</a></h2>
               <div class="level">
                 <div class="level-left">
-                  <div class="item-author">{{ exchange.user?.username }}</div>
+                  <div class="item-author">{{ exchange.user.username }}</div>
                 </div>
                 <div class="level-right">
                   27th December 2019

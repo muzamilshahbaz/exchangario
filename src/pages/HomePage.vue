@@ -22,6 +22,7 @@ export default {
     exchanges() {
       return this.$store.state.exchange.items;
     },
+    
     exchange_length() {
       return this.exchanges.length;
     },

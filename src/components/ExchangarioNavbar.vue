@@ -1,5 +1,5 @@
 <template>
-  <header class="header">
+  <header class="header" id="header">
     <nav
       class="navbar"
       v-bind:class="$route.path === '/' ? '' : 'with-background'"
